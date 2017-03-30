@@ -6,15 +6,16 @@
     @author Michael Asper
     @version 1.0 3/29/17
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 typedef struct Matrix {
-    int     rowSize;
-    int     columnSize;
-    long int*    matrix;
+    double              scalar;
+    size_t const        numRows;
+    size_t const        numCols;
+    double**            matrix;
 } Matrix;
 
 
@@ -24,10 +25,9 @@ typedef struct Matrix {
     @param *m pointer to Matrix to randomize;
 */
 void randomize(Matrix *m){
-    int i,j;
-    for(i = 0; i < m->rowSize ; i++){
-        for(j = 0; j < m->columnSize; j++){
-            *(m->matrix + i*m->rowSize  + j)= rand() % 5000;
+    for(size_t i = 0; i < m->numRows ; i++){
+        for(size_t j = 0; j < m->numCols; j++){
+             m->matrix[i][j] = rand() % 10;
         }
     }
 }
@@ -39,8 +39,23 @@ void randomize(Matrix *m){
     @param c The column size of the matrix
     @return r x c Matrix
 */
-Matrix createMatrix(int r, int c){
-    Matrix temp = {r, c, calloc(r * c, sizeof(long int *))};
+Matrix createMatrix(size_t const r, size_t const c){
+    Matrix temp = {1, r, c, calloc(r, sizeof(double))};
+
+    if (temp.matrix == NULL) {
+        fprintf(stderr, "Error: Memory allocation failed");
+        exit(1);
+    }
+
+    for (size_t i = 0; i < r; i++) {
+        temp.matrix[i] = calloc(c, sizeof temp.matrix[i][0]);
+
+        if (temp.matrix[i] == NULL) {
+             fprintf(stderr, "Error: Memory allocation failed");
+             exit(1);
+        }
+    }
+
     return temp;
 }
 
@@ -51,7 +66,7 @@ Matrix createMatrix(int r, int c){
     @param c The column size of the matrix
     @return r x c Matrix
 */
-Matrix createRandMatrix(int r, int c){
+Matrix createRandMatrix(size_t const r, size_t const c){
     Matrix temp = createMatrix(r,c);
     randomize(&temp);
     return temp;
@@ -62,40 +77,55 @@ Matrix createRandMatrix(int r, int c){
 
     @param *m Pointer to Matrix you want to print
 */
-void printMatrix(Matrix *m){
+void printMatrix(Matrix m){
     
-    int i,j;
-    for(i = 0; i < m->rowSize ; i++){
-        for(j = 0; j < m->columnSize; j++){
-            printf("%li ", *(m->matrix + i*m->rowSize  + j));
+    for(size_t i = 0; i < m.numRows ; i++){
+        for(size_t j = 0; j < m.numCols; j++){
+            printf("%-5.2f ",  m.matrix[i][j]);
         }
         printf("\n");
     }
 }
 
 /**
+
+    Multipy matrix by scalar;
+
+    @param s scalar
+    @param m matrix (M)
+    @return s*M
+*/
+Matrix scalarMultiply(int s, Matrix m){
+    Matrix result = createMatrix(m.numRows,m.numCols);
+    for(size_t i = 0; i < m.numRows ; i++){
+        for(size_t j = 0; j < m.numCols; j++){
+            result.matrix[i][j]=m.matrix[i][j] * s;
+        }
+    }
+    return result;
+}
+
+/**
     Adds two matrices together
 
-    @param *a pointer to first matrix (A);
-    @param *b pointer to second matrix (B);
+    @param a first matrix (A);
+    @param b second matrix (B);
     @return A+B
 */
-Matrix add(Matrix *a, Matrix *b){
+Matrix add(Matrix a, Matrix b){
     //check if matrices are compatible
-    if(a->rowSize != b->rowSize || a->columnSize != b->columnSize){
+    if(a.numRows != b.numRows || a.numCols != b.numCols){
         fprintf(stderr, "Error: Incompatible sizes");
         exit(0);
     }
     //create result matrix
-    int r = a->rowSize;
-    int c = a->columnSize;
+    size_t r = a.numRows;
+    size_t c = a.numCols;
     Matrix result = createMatrix(r,c);
     //add matrices
-    int i,j;
-    for(i = 0; i < r ; i++){
-        for(j = 0; j < c; j++){
-            //result[i][j] = a[i][j]+b[i][j]
-            *(result.matrix+ i*r  + j) = *(a->matrix + i*r  + j) + *(b->matrix + i*r  + j);
+    for(size_t i = 0; i < r ; i++){
+        for(size_t j = 0; j < c; j++){
+            result.matrix[i][j] = a.matrix[i][j]+b.matrix[i][j];
         }
     }
     return result;
@@ -104,77 +134,118 @@ Matrix add(Matrix *a, Matrix *b){
 /**
     Subtracts two matrices together
 
-    @param *a pointer to first matrix (A);
-    @param *b pointer to second matrix (B);
+    @param a first matrix (A);
+    @param b second matrix (B);
     @return A-B
 */
-Matrix sub(Matrix *a, Matrix *b){
-    //check if matrices are compatible
-    if(a->rowSize != b->rowSize || a->columnSize != b->columnSize){
-        fprintf(stderr, "Error: Incompatible sizes");
-        exit(0);
-    }
-    //create result matrix
-    int r = a->rowSize;
-    int c = a->columnSize;
-    Matrix result = createMatrix(r,c);
-    //subtracts matrix
-    int i,j;
-    for(i = 0; i < r ; i++){
-        for(j = 0; j < c; j++){
-            //result[i][j] = a[i][j]-b[i][j]
-            *(result.matrix+ i*r  + j) = *(a->matrix + i*r  + j) - *(b->matrix + i*r  + j);
-        }
-    }
-    return result;
+Matrix sub(Matrix a, Matrix b){
+    return add(a,scalarMultiply(-1,b));
 }
 
 /**
     Multiplies two matrices together
 
-    @param *a pointer to first matrix (A);
-    @param *b pointer to second matrix (B);
+    @param a first matrix (A);
+    @param b second matrix (B);
     @return A*B
 */
-Matrix multiply(Matrix *a, Matrix *b){
+Matrix multiply(Matrix a, Matrix b){
     //check if matrices are compatible
-    if(a->columnSize != b->rowSize ){
+    if(a.numCols != b.numRows ){
         fprintf(stderr, "Error: Incompatible sizes");
         exit(0);
     }
     
     //initialize return matrix
-    int r = a->rowSize;
-    int c = b->columnSize;
+    size_t r = a.numRows;
+    size_t c = b.numCols;
     Matrix result = createMatrix(r,c);
     
     //multiply matrices
-    int i,j;
-    for(i = 0; i < r ; i++){
-        for(j = 0; j < c; j++){
+    for(size_t i = 0; i < r ; i++){
+        for(size_t j = 0; j < c; j++){
             long int sum = 0;
-            int k;
-            for(k = 0; k < a->columnSize; k++){
-                //sum += a[i][k] * b[k][j]
-                sum = sum + (*(a->matrix + i*a->rowSize  + k)**(b->matrix + k*b->rowSize  + j));
+            for(size_t k = 0; k < a.numCols; k++){
+                sum += a.matrix[i][k] * b.matrix[k][j];
             }
-            *(result.matrix+ i*r  + j) = sum;
+            result.matrix[i][j] = sum;
         }
     }
     return result;
 }
 
 
+/**
+    Swap rows in a Matrix
+
+    @param r1 first row
+    @param r2 second row
+    @param m Matrix
+*/
+void swapRows(size_t r1, size_t r2, Matrix *m){
+    for (size_t i=0; i<m->numCols; ++i){
+        double temp = m->matrix[r2][i];
+        m->matrix[r2][i] = m->matrix[r1][i];
+        m->matrix[r1][i] = temp;
+    }
+}
+
+/**
+
+    Row reduces a matrix using Gaussian elimination with partial pivoting.
+
+    @param m matrix (M)
+*/
+void reduce(Matrix *m){
+    for(size_t i = 0; (i < m->numRows && i < m->numCols); i++){
+
+        int max = fabs(m->matrix[i][i]);
+        int maxRow = i;
+        
+        for(size_t j = i; j < m->numRows; j++){
+            if (max < fabs(m->matrix[j][i])){
+                max = fabs(m->matrix[j][i]);
+                maxRow = j;
+            }
+        }
+
+        if(maxRow != i){
+            swapRows(i, maxRow, m);
+            m->scalar *=-1; 
+        }
+        
+        for(size_t j = i+1; j < m->numRows; j++){
+            double factor = m->matrix[j][i]/m->matrix[i][i];
+            for(size_t k = 0; k < m->numCols; k++){
+                m->matrix[j][k] = m->matrix[j][k] - factor*m->matrix[i][k];
+            }
+        }
+    }
+}
+
+double calcDet(Matrix *m){
+    if(m->numCols != m->numRows){
+        fprintf(stderr, "Error: only square matrices have determinants");
+        exit(2);
+    }
+    double result = 1;
+    for(size_t i = 0; (i < m->numCols && i < m->numRows); ++i){
+        result *= m->matrix[i][i];
+    }
+    return m->scalar * result;
+}
+
 int main(){
     // seed random with time
     time_t t;
     srand((unsigned) time(&t));
-    
+
     //setup random matrices and multiply
-    Matrix a = createRandMatrix(3,100);
-    Matrix b = createRandMatrix(100,3);
-    Matrix result = multiply(&a,&b);
-    printMatrix(&result);
+    Matrix a = createRandMatrix(3,3);
+    printMatrix(a);
+    printf("\n\n");
+    reduce(&a);
+    printf("Determinant: %.2f", calcDet(&a));
     
     return 0;
 }
