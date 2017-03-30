@@ -19,6 +19,20 @@ typedef struct Matrix {
 
 
 /**
+    Randomizes the elements of a matrix
+
+    @param *m pointer to Matrix to randomize;
+*/
+void randomize(Matrix *m){
+    int i,j;
+    for(i = 0; i < m->rowSize ; i++){
+        for(j = 0; j < m->columnSize; j++){
+            *(m->matrix + i*m->rowSize  + j)= rand() % 5000;
+        }
+    }
+}
+
+/**
     Returns a r x c Matrix with all 0s.
 
     @param r The row size of the matrix
@@ -27,6 +41,19 @@ typedef struct Matrix {
 */
 Matrix createMatrix(int r, int c){
     Matrix temp = {r, c, calloc(r * c, sizeof(long int *))};
+    return temp;
+}
+
+/**
+    Returns a r x c Matrix with random numbers.
+
+    @param r The row size of the matrix
+    @param c The column size of the matrix
+    @return r x c Matrix
+*/
+Matrix createRandMatrix(int r, int c){
+    Matrix temp = createMatrix(r,c);
+    randomize(&temp);
     return temp;
 }
 
@@ -137,28 +164,17 @@ Matrix multiply(Matrix *a, Matrix *b){
     return result;
 }
 
-/**
-    Randomizes the elements of a matrix
-
-    @param *m pointer to Matrix to randomize;
-*/
-void randomize(Matrix *m){
-    int i,j;
-    for(i = 0; i < m->rowSize ; i++){
-        for(j = 0; j < m->columnSize; j++){
-            *(m->matrix + i*m->rowSize  + j)= rand() % 5000;
-        }
-    }
-}
 
 int main(){
+    // seed random with time
     time_t t;
     srand((unsigned) time(&t));
-    Matrix a = createMatrix(3,100);
-    Matrix b = createMatrix(100,3);
-    randomize(&a);
-    randomize(&b);
+    
+    //setup random matrices and multiply
+    Matrix a = createRandMatrix(3,100);
+    Matrix b = createRandMatrix(100,3);
     Matrix result = multiply(&a,&b);
     printMatrix(&result);
+    
     return 0;
 }
