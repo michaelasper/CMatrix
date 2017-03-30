@@ -254,7 +254,7 @@ double calcDet(Matrix m){
         fprintf(stderr, "Error: only square matrices have determinants");
         exit(2);
     }
-    
+
     Matrix temp = reduce(m);
     double result = 1;
     for(size_t i = 0; (i < temp.numCols && i < temp.numRows); ++i){
@@ -272,7 +272,6 @@ int main(){
     Matrix a = createRandMatrix(3,3);
     printMatrix(a);
     printf("\n\n");
-    a = reduce(a);
     printf("Determinant: %.2f", calcDet(a));
     
     return 0;
