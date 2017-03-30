@@ -32,6 +32,7 @@ void randomize(Matrix *m){
     }
 }
 
+
 /**
     Returns a r x c Matrix with all 0s.
 
@@ -57,6 +58,22 @@ Matrix createMatrix(size_t const r, size_t const c){
     }
 
     return temp;
+}
+
+/**
+    Copy Matrix
+
+    @param m Matrix M
+    @return copy of A
+*/
+Matrix copy(Matrix m){
+    Matrix result = createMatrix(m.numRows, m.numCols);
+    for(size_t i = 0; i < m.numRows ; i++){
+        for(size_t j = 0; j < m.numCols; j++){
+            result.matrix[i][j] = m.matrix[i][j];
+        }
+    }
+    return result;
 }
 
 /**
@@ -196,43 +213,54 @@ void swapRows(size_t r1, size_t r2, Matrix *m){
 
     @param m matrix (M)
 */
-void reduce(Matrix *m){
-    for(size_t i = 0; (i < m->numRows && i < m->numCols); i++){
+Matrix reduce(Matrix m){
+    Matrix result = copy(m);
+    for(size_t i = 0; (i < result.numRows && i < result.numCols); i++){
 
-        int max = fabs(m->matrix[i][i]);
+        int max = fabs(result.matrix[i][i]);
         int maxRow = i;
         
-        for(size_t j = i; j < m->numRows; j++){
-            if (max < fabs(m->matrix[j][i])){
-                max = fabs(m->matrix[j][i]);
+        for(size_t j = i; j < result.numRows; j++){
+            if (max < fabs(result.matrix[j][i])){
+                max = fabs(result.matrix[j][i]);
                 maxRow = j;
             }
         }
 
         if(maxRow != i){
-            swapRows(i, maxRow, m);
-            m->scalar *=-1; 
+            swapRows(i, maxRow, &result);
+            result.scalar *=-1; 
         }
         
-        for(size_t j = i+1; j < m->numRows; j++){
-            double factor = m->matrix[j][i]/m->matrix[i][i];
-            for(size_t k = 0; k < m->numCols; k++){
-                m->matrix[j][k] = m->matrix[j][k] - factor*m->matrix[i][k];
+        for(size_t j = i+1; j < result.numRows; j++){
+            double factor = result.matrix[j][i]/result.matrix[i][i];
+            for(size_t k = 0; k < result.numCols; k++){
+                result.matrix[j][k] = result.matrix[j][k] - factor*result.matrix[i][k];
             }
         }
     }
+
+    return result;
 }
 
-double calcDet(Matrix *m){
-    if(m->numCols != m->numRows){
+/**
+    Computes determinant for a square Matrix
+
+    @param *m pointer to matrix (A)
+    @return double determinant of matrix (det(A))
+*/
+double calcDet(Matrix m){
+    if(m.numCols != m.numRows){
         fprintf(stderr, "Error: only square matrices have determinants");
         exit(2);
     }
+    
+    Matrix temp = reduce(m);
     double result = 1;
-    for(size_t i = 0; (i < m->numCols && i < m->numRows); ++i){
-        result *= m->matrix[i][i];
+    for(size_t i = 0; (i < temp.numCols && i < temp.numRows); ++i){
+        result *= temp.matrix[i][i];
     }
-    return m->scalar * result;
+    return temp.scalar * result;
 }
 
 int main(){
@@ -244,8 +272,8 @@ int main(){
     Matrix a = createRandMatrix(3,3);
     printMatrix(a);
     printf("\n\n");
-    reduce(&a);
-    printf("Determinant: %.2f", calcDet(&a));
+    a = reduce(a);
+    printf("Determinant: %.2f", calcDet(a));
     
     return 0;
 }
