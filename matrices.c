@@ -32,7 +32,7 @@ Matrix createMatrix(int r, int c){
 
 /**
     Prints matrix.
-    
+
     @param *m Pointer to Matrix you want to print
 */
 void printMatrix(Matrix *m){
@@ -63,10 +63,11 @@ Matrix add(Matrix *a, Matrix *b){
     int r = a->rowSize;
     int c = a->columnSize;
     Matrix result = createMatrix(r,c);
-    //add matrix
+    //add matrices
     int i,j;
     for(i = 0; i < r ; i++){
         for(j = 0; j < c; j++){
+            //result[i][j] = a[i][j]+b[i][j]
             *(result.matrix+ i*r  + j) = *(a->matrix + i*r  + j) + *(b->matrix + i*r  + j);
         }
     }
@@ -90,10 +91,11 @@ Matrix sub(Matrix *a, Matrix *b){
     int r = a->rowSize;
     int c = a->columnSize;
     Matrix result = createMatrix(r,c);
-    //add matrix
+    //subtracts matrix
     int i,j;
     for(i = 0; i < r ; i++){
         for(j = 0; j < c; j++){
+            //result[i][j] = a[i][j]-b[i][j]
             *(result.matrix+ i*r  + j) = *(a->matrix + i*r  + j) - *(b->matrix + i*r  + j);
         }
     }
@@ -108,19 +110,25 @@ Matrix sub(Matrix *a, Matrix *b){
     @return A*B
 */
 Matrix multiply(Matrix *a, Matrix *b){
+    //check if matrices are compatible
     if(a->columnSize != b->rowSize ){
         fprintf(stderr, "Error: Incompatible sizes");
         exit(0);
     }
+    
+    //initialize return matrix
     int r = a->rowSize;
     int c = b->columnSize;
     Matrix result = createMatrix(r,c);
+    
+    //multiply matrices
     int i,j;
     for(i = 0; i < r ; i++){
         for(j = 0; j < c; j++){
             long int sum = 0;
             int k;
             for(k = 0; k < a->columnSize; k++){
+                //sum += a[i][k] * b[k][j]
                 sum = sum + (*(a->matrix + i*a->rowSize  + k)**(b->matrix + k*b->rowSize  + j));
             }
             *(result.matrix+ i*r  + j) = sum;
