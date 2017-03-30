@@ -1,3 +1,12 @@
+/**
+    Matrix Multiplication
+    matrices.c
+    Matrix data structure in C.
+
+    @author Michael Asper
+    @version 1.0 3/29/17
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -8,12 +17,26 @@ typedef struct Matrix {
     long int*    matrix;
 } Matrix;
 
+
+/**
+    Returns a r x c Matrix with all 0s.
+
+    @param r The row size of the matrix
+    @param c The column size of the matrix
+    @return r x c Matrix
+*/
 Matrix createMatrix(int r, int c){
     Matrix temp = {r, c, calloc(r * c, sizeof(long int *))};
     return temp;
 }
 
+/**
+    Prints matrix.
+    
+    @param *m Pointer to Matrix you want to print
+*/
 void printMatrix(Matrix *m){
+    
     int i,j;
     for(i = 0; i < m->rowSize ; i++){
         for(j = 0; j < m->columnSize; j++){
@@ -23,6 +46,13 @@ void printMatrix(Matrix *m){
     }
 }
 
+/**
+    Adds two matrices together
+
+    @param *a pointer to first matrix (A);
+    @param *b pointer to second matrix (B);
+    @return A+B
+*/
 Matrix add(Matrix *a, Matrix *b){
     //check if matrices are compatible
     if(a->rowSize != b->rowSize || a->columnSize != b->columnSize){
@@ -43,6 +73,13 @@ Matrix add(Matrix *a, Matrix *b){
     return result;
 }
 
+/**
+    Subtracts two matrices together
+
+    @param *a pointer to first matrix (A);
+    @param *b pointer to second matrix (B);
+    @return A-B
+*/
 Matrix sub(Matrix *a, Matrix *b){
     //check if matrices are compatible
     if(a->rowSize != b->rowSize || a->columnSize != b->columnSize){
@@ -63,6 +100,13 @@ Matrix sub(Matrix *a, Matrix *b){
     return result;
 }
 
+/**
+    Multiplies two matrices together
+
+    @param *a pointer to first matrix (A);
+    @param *b pointer to second matrix (B);
+    @return A*B
+*/
 Matrix multiply(Matrix *a, Matrix *b){
     if(a->columnSize != b->rowSize ){
         fprintf(stderr, "Error: Incompatible sizes");
@@ -85,6 +129,11 @@ Matrix multiply(Matrix *a, Matrix *b){
     return result;
 }
 
+/**
+    Randomizes the elements of a matrix
+
+    @param *m pointer to Matrix to randomize;
+*/
 void randomize(Matrix *m){
     int i,j;
     for(i = 0; i < m->rowSize ; i++){
