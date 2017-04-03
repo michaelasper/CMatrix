@@ -4,7 +4,7 @@
     Matrix data structure in C.
 
     @author Michael Asper
-    @version 1.0 3/29/17
+    @version 1.0 2017-30-3
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +41,7 @@ void randomize(Matrix *m){
     @return r x c Matrix
 */
 Matrix createMatrix(size_t const r, size_t const c){
-    Matrix temp = {1, r, c, calloc(r, sizeof(double))};
+    Matrix temp = {1, r, c, calloc(r, sizeof(double[c]))};
 
     if (temp.matrix == NULL) {
         fprintf(stderr, "Error: Memory allocation failed");
@@ -88,6 +88,17 @@ Matrix createRandMatrix(size_t const r, size_t const c){
     randomize(&temp);
     return temp;
 }
+/**
+    Delete a matrix
+*/
+void delete(Matrix m)
+{
+    for (size_t i = m.numRows; i > 0; i--) {
+        free(m.matrix[i-1]);
+    }
+	free(m.matrix);
+}
+ 
 
 /**
     Prints matrix.
@@ -244,6 +255,25 @@ Matrix reduce(Matrix m){
 }
 
 /**
+    Transpose a Matrix
+
+    @param m Matrix(A)
+    @return A^t
+*/
+Matrix transpose(Matrix m){
+    Matrix result = createMatrix(m.numCols,m.numRows);
+
+    for(size_t i = 0; i < result.numRows; ++i){
+        for(size_t j = 0; j < result.numCols; ++j){
+            result.matrix[i][j] = m.matrix[j][i];
+        }
+    }
+
+    return result;
+}
+
+
+/**
     Computes determinant for a square Matrix
 
     @param *m pointer to matrix (A)
@@ -263,6 +293,17 @@ double calcDet(Matrix m){
     return temp.scalar * result;
 }
 
+
+/**
+    QR factorization using Given's rotation
+
+    Dear lord, please have mercy on me
+*/
+void qr(Matrix m, Matrix *q, Matrix *r){
+    
+}
+
+
 int main(){
     // seed random with time
     time_t t;
@@ -272,7 +313,6 @@ int main(){
     Matrix a = createRandMatrix(3,3);
     printMatrix(a);
     printf("\n\n");
-    printf("Determinant: %.2f", calcDet(a));
-    
+
     return 0;
 }
