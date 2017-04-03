@@ -10,14 +10,19 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <complex.h>
 
 typedef struct Matrix {
-    double              scalar;
-    size_t const        numRows;
-    size_t const        numCols;
-    double**            matrix;
+    double complex              scalar;
+    size_t const                numRows;
+    size_t const                numCols;
+    double complex**            matrix;
 } Matrix;
 
+
+double complex sign(double complex a){
+    return a / cabs(a);
+}
 
 /**
     Randomizes the elements of a matrix
@@ -27,7 +32,7 @@ typedef struct Matrix {
 void randomize(Matrix *m){
     for(size_t i = 0; i < m->numRows ; i++){
         for(size_t j = 0; j < m->numCols; j++){
-             m->matrix[i][j] = rand() % 10;
+             m->matrix[i][j] = 1+ (rand() % 5) + ((rand() % 5) * I);
         }
     }
 }
@@ -55,6 +60,22 @@ Matrix createMatrix(size_t const r, size_t const c){
              fprintf(stderr, "Error: Memory allocation failed");
              exit(1);
         }
+    }
+
+    return temp;
+}
+
+/**
+    Returns a r x r Matrix
+
+    @param r The row x row size of the matrix
+    @return r x r Matrix
+*/
+Matrix createIdentity(size_t const r){
+    Matrix temp = createMatrix(r,r);
+
+    for(size_t i = 0; i < r; i++){
+        temp.matrix[i][i] = 1;
     }
 
     return temp;
@@ -109,10 +130,12 @@ void printMatrix(Matrix m){
     
     for(size_t i = 0; i < m.numRows ; i++){
         for(size_t j = 0; j < m.numCols; j++){
-            printf("%-5.2f ",  m.matrix[i][j]);
+            printf("(%3.1f + %3.1fi) ", crealf(m.matrix[i][j]), cimagf(m.matrix[i][j]));
         }
         printf("\n");
     }
+            printf("\n");
+
 }
 
 /**
@@ -192,7 +215,7 @@ Matrix multiply(Matrix a, Matrix b){
     //multiply matrices
     for(size_t i = 0; i < r ; i++){
         for(size_t j = 0; j < c; j++){
-            long int sum = 0;
+            double complex sum = 0;
             for(size_t k = 0; k < a.numCols; k++){
                 sum += a.matrix[i][k] * b.matrix[k][j];
             }
@@ -212,7 +235,7 @@ Matrix multiply(Matrix a, Matrix b){
 */
 void swapRows(size_t r1, size_t r2, Matrix *m){
     for (size_t i=0; i<m->numCols; ++i){
-        double temp = m->matrix[r2][i];
+        double complex temp = m->matrix[r2][i];
         m->matrix[r2][i] = m->matrix[r1][i];
         m->matrix[r1][i] = temp;
     }
@@ -228,12 +251,12 @@ Matrix reduce(Matrix m){
     Matrix result = copy(m);
     for(size_t i = 0; (i < result.numRows && i < result.numCols); i++){
 
-        int max = fabs(result.matrix[i][i]);
+        double max = cabs(result.matrix[i][i]);
         int maxRow = i;
         
         for(size_t j = i; j < result.numRows; j++){
-            if (max < fabs(result.matrix[j][i])){
-                max = fabs(result.matrix[j][i]);
+            if (max < cabs(result.matrix[j][i])){
+                max = cabs(result.matrix[j][i]);
                 maxRow = j;
             }
         }
@@ -242,9 +265,8 @@ Matrix reduce(Matrix m){
             swapRows(i, maxRow, &result);
             result.scalar *=-1; 
         }
-        
         for(size_t j = i+1; j < result.numRows; j++){
-            double factor = result.matrix[j][i]/result.matrix[i][i];
+            double complex factor = result.matrix[j][i]/result.matrix[i][i];
             for(size_t k = 0; k < result.numCols; k++){
                 result.matrix[j][k] = result.matrix[j][k] - factor*result.matrix[i][k];
             }
@@ -279,20 +301,50 @@ Matrix transpose(Matrix m){
     @param *m pointer to matrix (A)
     @return double determinant of matrix (det(A))
 */
-double calcDet(Matrix m){
+double complex calcDet(Matrix m){
     if(m.numCols != m.numRows){
         fprintf(stderr, "Error: only square matrices have determinants");
         exit(2);
     }
 
     Matrix temp = reduce(m);
-    double result = 1;
+    double complex result = 1;
     for(size_t i = 0; (i < temp.numCols && i < temp.numRows); ++i){
         result *= temp.matrix[i][i];
     }
     return temp.scalar * result;
 }
 
+
+
+
+double norm(double complex a, double complex b){
+    return sqrt(cabs(a) + cabs(b));
+}
+
+Matrix givensrotation(Matrix m, size_t i, size_t j){
+    double complex a = m.matrix[i-1][j];
+    double complex b = m.matrix[i][j];
+    double complex c, s, s0, c0;
+    double abs_a = cabs(a);
+    
+    if (abs_a == 0){
+        c = 0;
+        s = 1;
+    }else{
+        double nrm = norm(a,b);
+        c = abs_a/nrm;
+        s = a/abs_a * (conj(b)/nrm);
+    }
+    
+    Matrix givens = createIdentity(m.numRows);
+    givens.matrix[i][i-1] = -conj(s);
+    givens.matrix[i-1][i-1] = c;
+    givens.matrix[i-1][i] = s;
+    givens.matrix[i][i] = c;
+    Matrix result = multiply(givens, m);
+    return result;
+}
 
 /**
     QR factorization using Given's rotation
@@ -303,7 +355,6 @@ void qr(Matrix m, Matrix *q, Matrix *r){
     
 }
 
-
 int main(){
     // seed random with time
     time_t t;
@@ -312,7 +363,10 @@ int main(){
     //setup random matrices and multiply
     Matrix a = createRandMatrix(3,3);
     printMatrix(a);
-    printf("\n\n");
-
+    Matrix a2 = givensrotation(a, 2, 0);
+    Matrix a3 = givensrotation(a2, 1, 0);
+    Matrix a4 = givensrotation(a3, 2, 1);
+    printMatrix(a4);
     return 0;
+    
 }
