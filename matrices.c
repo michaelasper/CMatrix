@@ -32,7 +32,7 @@ double complex sign(double complex a){
 void randomize(Matrix *m){
     for(size_t i = 0; i < m->numRows ; i++){
         for(size_t j = 0; j < m->numCols; j++){
-             m->matrix[i][j] = 1+ ((double)rand()/RAND_MAX * 50) + (((double)rand()/RAND_MAX * 50) * I);
+             m->matrix[i][j] = 1+ (rand() % 5) + ((rand() % 5) * I);
         }
     }
 }
@@ -130,8 +130,7 @@ void printMatrix(Matrix m){
     
     for(size_t i = 0; i < m.numRows ; i++){
         for(size_t j = 0; j < m.numCols; j++){
-            printf("(%5.3f + %5.3fi) ", crealf(m.matrix[i][j]), cimagf(m.matrix[i][j]));
-            //printf("(%5.3f) ", crealf(m.matrix[i][j]));
+            printf("(%3.1f + %3.1fi) ", crealf(m.matrix[i][j]), cimagf(m.matrix[i][j]));
         }
         printf("\n");
     }
@@ -225,6 +224,34 @@ Matrix multiply(Matrix a, Matrix b){
     }
     return result;
 }
+/**
+    Matrix exponentiation for n >= 0
+    "Exponentiation by squaring"
+    Note: This algorithm runs in O(logn) time 
+    where n x n is the size of the square matrix
+   
+    Not sure what to do for n < 0
+    
+    @param a Matrix to be exponentiated
+    @param n exponent
+    @return A^n
+*/
+Matrix power(Matrix a, int n) {
+	
+	Matrix b = multiply(a, a);
+	if(n == 0) {
+		return createIdentity(a.numRows);
+	}
+	else if(n == 1){
+		return a;
+	}
+	else if(n % 2 == 1) {
+		return power(multiply(a, b), (n-1)/2);
+	}
+	else {
+		return power(b, n/2);
+	}
+}
 
 
 /**
@@ -288,7 +315,7 @@ Matrix transpose(Matrix m){
 
     for(size_t i = 0; i < result.numRows; ++i){
         for(size_t j = 0; j < result.numCols; ++j){
-            result.matrix[i][j] = conj(m.matrix[j][i]);
+            result.matrix[i][j] = m.matrix[j][i];
         }
     }
 
@@ -320,14 +347,13 @@ double complex calcDet(Matrix m){
 
 
 double norm(double complex a, double complex b){
-    return sqrt(cabs(a)*cabs(a) + cabs(b)*cabs(b));
+    return sqrt(cabs(a) + cabs(b));
 }
 
 Matrix givensrotation(Matrix m, size_t i, size_t j){
     double complex a = m.matrix[i-1][j];
     double complex b = m.matrix[i][j];
-    double c;
-    double complex s;
+    double complex c, s, s0, c0;
     double abs_a = cabs(a);
     
     if (abs_a == 0){
@@ -336,7 +362,7 @@ Matrix givensrotation(Matrix m, size_t i, size_t j){
     }else{
         double nrm = norm(a,b);
         c = abs_a/nrm;
-        s = (a/abs_a) * (conj(b)/nrm);
+        s = a/abs_a * (conj(b)/nrm);
     }
     
     Matrix givens = createIdentity(m.numRows);
@@ -344,7 +370,8 @@ Matrix givensrotation(Matrix m, size_t i, size_t j){
     givens.matrix[i-1][i-1] = c;
     givens.matrix[i-1][i] = s;
     givens.matrix[i][i] = c;
-    return givens;
+    Matrix result = multiply(givens, m);
+    return result;
 }
 
 /**
@@ -352,31 +379,8 @@ Matrix givensrotation(Matrix m, size_t i, size_t j){
 
     Dear lord, please have mercy on me
 */
-void eigenvalues(Matrix m){
-    Matrix R = copy(m);
-    Matrix givens;
-    Matrix Q = createIdentity(m.numRows);
-    for(int g = 0; g < 20; g++){
-        givens = createIdentity(m.numRows);
-        for(size_t j = 0; j < (m.numCols-1);j++){
-            for(size_t i = m.numRows-1; i > (0+j); --i){
-                Matrix temp = givensrotation(R, i, j);
-
-                R = multiply(temp, R);
-                givens = multiply(givens,transpose(temp));
-                delete(temp);
-            }
-        }
-        R = multiply(R, givens);
-    }
-    printf("Eigenvalues: ");
-    for(size_t i = 0;i< m.numRows;i++){
-        if(i != m.numRows-1)
-            printf("%5.3f + %5.3fi, ", crealf(R.matrix[i][i]), cimagf(R.matrix[i][i]));
-        else
-            printf("%5.3f + %5.3fi", crealf(R.matrix[i][i]), cimagf(R.matrix[i][i]));
-
-    }
+void qr(Matrix m, Matrix *q, Matrix *r){
+    
 }
 
 int main(){
@@ -387,7 +391,11 @@ int main(){
     //setup random matrices and multiply
     Matrix a = createRandMatrix(3,3);
     printMatrix(a);
-    eigenvalues(a);
+    Matrix a2 = givensrotation(a, 2, 0);
+    Matrix a3 = givensrotation(a2, 1, 0);
+    Matrix a4 = givensrotation(a3, 2, 1);
+    printMatrix(a4);
+
     return 0;
     
 }
