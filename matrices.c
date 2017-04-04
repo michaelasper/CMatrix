@@ -130,7 +130,7 @@ void printMatrix(Matrix m){
     
     for(size_t i = 0; i < m.numRows ; i++){
         for(size_t j = 0; j < m.numCols; j++){
-            printf("(%f + %fi) ", crealf(m.matrix[i][j]), cimagf(m.matrix[i][j]));
+            printf("(%Lf + %Lfi) ", creall(m.matrix[i][j]), cimagl(m.matrix[i][j]));
             //printf("(%5.3f) ", crealf(m.matrix[i][j]));
         }
         printf("\n");
@@ -413,8 +413,25 @@ int main(){
     srand((unsigned) time(&t));
 
     //setup random matrices and multiply
-    Matrix a = createRandMatrix(3,3);
-    eigenvalues(a);
-    return 0;
+    
+    Matrix a = createMatrix(2,2);
+	a.matrix[0][0] = 1;
+	a.matrix[0][1] = 1;
+	a.matrix[1][0] = 1;
+	a.matrix[1][1] = 0;
+	/**
+	for(int i = 1; i<=100; i++) {
+		printf("Iteration: %d\n", i);
+		printMatrix(power(a, i));
+	}
+	*/
+
+	Matrix b = copy(a);
+	for(int i = 1; i<=100; i++) {
+		b = multiply(b, a);
+		printf("Iteration: %d\n", i);
+		printMatrix(b);
+	}
+
     
 }
