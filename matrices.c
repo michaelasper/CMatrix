@@ -38,6 +38,8 @@ long double complex sign(long double complex a){
     @param *m pointer to Matrix to randomize;
 */
 void randomize(Matrix *m){
+    time_t t;
+    srand((unsigned) time(&t));
     for(size_t i = 0; i < m->numRows ; i++){
         for(size_t j = 0; j < m->numCols; j++){
              m->matrix[i][j] = ((double)rand()/RAND_MAX * 5) + (((double)rand()/RAND_MAX * 5) * I);
@@ -351,7 +353,9 @@ long double complex calcDet(Matrix m){
     for(size_t i = 0; (i < temp.numCols && i < temp.numRows); ++i){
         result *= temp.matrix[i][i];
     }
-    return temp.scalar * result;
+    double complex det = temp.scalar * result;
+    delete(temp);
+    return det;
 }
 
 
@@ -432,31 +436,7 @@ void eigenvalues(Matrix m){
 }
 
 int main(){
-    // seed random with time
-    time_t t;
-    srand((unsigned) time(&t));
-
-    //setup random matrices and multiply
-    
+        
     Matrix a = createMatrix(2,2);
-	a.matrix[0][0] = 1.0;
-	a.matrix[0][1] = 1.0;
-	a.matrix[1][0] = 1.0;
-	a.matrix[1][1] = 0.0;
-	/**
-	for(int i = 1; i<=100; i++) {
-		printf("Iteration: %d\n", i);
-		printMatrix(power(a, i));
-	}
-	*/
-    long double complex test = COMPLXL(CMPLXL(12200160415121876738,0) + CMPLXL(7540113804746346429,0);
-    printf("%Lf + %Lgi", creall(test), cimagl(test));
-	Matrix b = copy(a);
-	// for(int i = 1; i<=99; i++) {
-	// 	b = multiply(b, a);
-	// 	printf("Iteration: %d\n", i);
-	// 	printMatrix(b);
-	// }
-
     
 }
