@@ -411,7 +411,7 @@ Matrix givensrotation(Matrix m, size_t i, size_t j){
 void eigenvalues(Matrix m){
     Matrix R = copy(m);
     Matrix givens;
-    Matrix Q = createIdentity(m.numRows);
+    //Matrix Q = createIdentity(m.numRows);
     for(int g = 0; g < 20; g++){
         givens = createIdentity(m.numRows);
         for(size_t j = 0; j < (m.numCols-1);j++){
@@ -437,6 +437,6 @@ void eigenvalues(Matrix m){
 
 int main(){
         
-    Matrix a = createMatrix(2,2);
+    //Matrix a = createMatrix(2,2);
     
 }
