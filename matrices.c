@@ -13,15 +13,15 @@
 #include <complex.h>
 
 typedef struct Matrix {
-    double complex              scalar;
+    long double complex              scalar;
     size_t const                numRows;
     size_t const                numCols;
-    double complex**            matrix;
+    long double complex**            matrix;
 } Matrix;
 
 
-double complex sign(double complex a){
-    return a / cabs(a);
+long double complex sign(long double complex a){
+    return a / cabsl(a);
 }
 
 /**
@@ -216,7 +216,7 @@ Matrix multiply(Matrix a, Matrix b){
     //multiply matrices
     for(size_t i = 0; i < r ; i++){
         for(size_t j = 0; j < c; j++){
-            double complex sum = 0;
+            long double complex sum = 0;
             for(size_t k = 0; k < a.numCols; k++){
                 sum += a.matrix[i][k] * b.matrix[k][j];
             }
@@ -264,7 +264,7 @@ Matrix power(Matrix a, int n) {
 */
 void swapRows(size_t r1, size_t r2, Matrix *m){
     for (size_t i=0; i<m->numCols; ++i){
-        double complex temp = m->matrix[r2][i];
+        long double complex temp = m->matrix[r2][i];
         m->matrix[r2][i] = m->matrix[r1][i];
         m->matrix[r1][i] = temp;
     }
@@ -280,12 +280,12 @@ Matrix reduce(Matrix m){
     Matrix result = copy(m);
     for(size_t i = 0; (i < result.numRows && i < result.numCols); i++){
 
-        double max = cabs(result.matrix[i][i]);
+        double max = cabsl(result.matrix[i][i]);
         int maxRow = i;
         
         for(size_t j = i; j < result.numRows; j++){
-            if (max < cabs(result.matrix[j][i])){
-                max = cabs(result.matrix[j][i]);
+            if (max < cabsl(result.matrix[j][i])){
+                max = cabsl(result.matrix[j][i]);
                 maxRow = j;
             }
         }
@@ -295,7 +295,7 @@ Matrix reduce(Matrix m){
             result.scalar *=-1; 
         }
         for(size_t j = i+1; j < result.numRows; j++){
-            double complex factor = result.matrix[j][i]/result.matrix[i][i];
+            long double complex factor = result.matrix[j][i]/result.matrix[i][i];
             for(size_t k = 0; k < result.numCols; k++){
                 result.matrix[j][k] = result.matrix[j][k] - factor*result.matrix[i][k];
             }
@@ -330,14 +330,14 @@ Matrix transpose(Matrix m){
     @param *m pointer to matrix (A)
     @return double determinant of matrix (det(A))
 */
-double complex calcDet(Matrix m){
+long double complex calcDet(Matrix m){
     if(m.numCols != m.numRows){
         fprintf(stderr, "Error: only square matrices have determinants");
         exit(2);
     }
 
     Matrix temp = reduce(m);
-    double complex result = 1;
+    long double complex result = 1;
     for(size_t i = 0; (i < temp.numCols && i < temp.numRows); ++i){
         result *= temp.matrix[i][i];
     }
@@ -347,16 +347,16 @@ double complex calcDet(Matrix m){
 
 
 
-double norm(double complex a, double complex b){
-    return sqrt(cabs(a)*cabs(a) + cabs(b)*cabs(b));
+double norm(long double complex a, long double complex b){
+    return sqrt(cabsl(a)*cabsl(a) + cabsl(b)*cabsl(b));
 }
 
 Matrix givensrotation(Matrix m, size_t i, size_t j){
-    double complex a = m.matrix[i-1][j];
-    double complex b = m.matrix[i][j];
+    long double complex a = m.matrix[i-1][j];
+    long double complex b = m.matrix[i][j];
     double c;
-    double complex s;
-    double abs_a = cabs(a);
+    long double complex s;
+    double abs_a = cabsl(a);
     
     if (abs_a == 0){
         c = 0;
