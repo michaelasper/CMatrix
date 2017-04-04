@@ -15,8 +15,8 @@
 
 typedef struct Matrix {
     long double complex              scalar;
-    size_t const                numRows;
-    size_t const                numCols;
+    size_t                          numRows;
+    size_t                          numCols;
     long double complex**            matrix;
 } Matrix;
 
@@ -55,7 +55,7 @@ void randomize(Matrix *m){
     @param c The column size of the matrix
     @return r x c Matrix
 */
-Matrix createMatrix(size_t const r, size_t const c){
+Matrix createMatrix(size_t r, size_t c){
     Matrix temp = {1, r, c, calloc(r, sizeof(long double[c]))};
 
     if (temp.matrix == NULL) {
@@ -81,7 +81,7 @@ Matrix createMatrix(size_t const r, size_t const c){
     @param r The row x row size of the matrix
     @return r x r Identity
 */
-Matrix createIdentity(size_t const r){
+Matrix createIdentity(size_t r){
     Matrix temp = createMatrix(r,r);
 
     for(size_t i = 0; i < r; i++){
@@ -114,7 +114,7 @@ Matrix copy(Matrix m){
     @param c The column size of the matrix
     @return r x c Matrix
 */
-Matrix createRandMatrix(size_t const r, size_t const c){
+Matrix createRandMatrix(size_t r, size_t c){
     Matrix temp = createMatrix(r,c);
     randomize(&temp);
     return temp;
