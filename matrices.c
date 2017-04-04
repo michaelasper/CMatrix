@@ -3,8 +3,8 @@
     matrices.c
     Matrix data structure in C.
 
-    @author Michael Asper
-    @version 1.0 2017-30-3
+    @author Michael Asper and Daniel Mancia
+    @version 1.2 2017-03-4
 */
 #include <stdio.h>
 #include <stdlib.h>
