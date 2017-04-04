@@ -247,7 +247,7 @@ Matrix power(Matrix a, int n) {
 	    return a;
 	}
 	else if(n % 2 == 1) {
-	    return power(multiply(a, b), (n-1)/2);
+	    return multiply(a, power(b, (n-1)/2));
 	}
 	else {
 	    return power(b, n/2);
