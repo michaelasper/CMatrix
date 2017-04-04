@@ -130,7 +130,7 @@ void printMatrix(Matrix m){
     
     for(size_t i = 0; i < m.numRows ; i++){
         for(size_t j = 0; j < m.numCols; j++){
-            printf("(%5.3f + %5.3fi) ", crealf(m.matrix[i][j]), cimagf(m.matrix[i][j]));
+            printf("(%f + %fi) ", crealf(m.matrix[i][j]), cimagf(m.matrix[i][j]));
             //printf("(%5.3f) ", crealf(m.matrix[i][j]));
         }
         printf("\n");
@@ -400,9 +400,9 @@ void eigenvalues(Matrix m){
     printf("Eigenvalues: ");
     for(size_t i = 0;i< m.numRows;i++){
         if(i != m.numRows-1)
-            printf("%5.3f + %5.3fi, ", crealf(R.matrix[i][i]), cimagf(R.matrix[i][i]));
+            printf("%f + %fi, ", crealf(R.matrix[i][i]), cimagf(R.matrix[i][i]));
         else
-            printf("%5.3f + %5.3fi", crealf(R.matrix[i][i]), cimagf(R.matrix[i][i]));
+            printf("%f + %fi", crealf(R.matrix[i][i]), cimagf(R.matrix[i][i]));
 
     }
 }
