@@ -143,7 +143,7 @@ void printMatrix(Matrix m){
     
     for(size_t i = 0; i < m.numRows ; i++){
         for(size_t j = 0; j < m.numCols; j++){
-            printf("(%L.0f + %Lgi) ", creall(m.matrix[i][j]), cimagl(m.matrix[i][j]));
+            printf("(%Lg.0f + %Lgi) ", creall(m.matrix[i][j]), cimagl(m.matrix[i][j]));
             //printf("(%5.3f) ", crealf(m.matrix[i][j]));
         }
         printf("\n");
