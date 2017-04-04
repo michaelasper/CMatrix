@@ -11,6 +11,7 @@
 #include <time.h>
 #include <math.h>
 #include <complex.h>
+#include <float.h>
 
 typedef struct Matrix {
     long double complex              scalar;
@@ -46,7 +47,7 @@ void randomize(Matrix *m){
     @return r x c Matrix
 */
 Matrix createMatrix(size_t const r, size_t const c){
-    Matrix temp = {1, r, c, calloc(r, sizeof(double[c]))};
+    Matrix temp = {1, r, c, calloc(r, sizeof(long double[c]))};
 
     if (temp.matrix == NULL) {
         fprintf(stderr, "Error: Memory allocation failed");
@@ -130,7 +131,7 @@ void printMatrix(Matrix m){
     
     for(size_t i = 0; i < m.numRows ; i++){
         for(size_t j = 0; j < m.numCols; j++){
-            printf("(%Lf + %Lfi) ", creall(m.matrix[i][j]), cimagl(m.matrix[i][j]));
+            printf("(%L.0f + %Lgi) ", creall(m.matrix[i][j]), cimagl(m.matrix[i][j]));
             //printf("(%5.3f) ", crealf(m.matrix[i][j]));
         }
         printf("\n");
@@ -216,7 +217,7 @@ Matrix multiply(Matrix a, Matrix b){
     //multiply matrices
     for(size_t i = 0; i < r ; i++){
         for(size_t j = 0; j < c; j++){
-            long double complex sum = 0;
+            long double complex sum = CMPLXL(0,0);
             for(size_t k = 0; k < a.numCols; k++){
                 sum += a.matrix[i][k] * b.matrix[k][j];
             }
@@ -415,23 +416,24 @@ int main(){
     //setup random matrices and multiply
     
     Matrix a = createMatrix(2,2);
-	a.matrix[0][0] = 1;
-	a.matrix[0][1] = 1;
-	a.matrix[1][0] = 1;
-	a.matrix[1][1] = 0;
+	a.matrix[0][0] = 1.0;
+	a.matrix[0][1] = 1.0;
+	a.matrix[1][0] = 1.0;
+	a.matrix[1][1] = 0.0;
 	/**
 	for(int i = 1; i<=100; i++) {
 		printf("Iteration: %d\n", i);
 		printMatrix(power(a, i));
 	}
 	*/
-
+    long double complex test = COMPLXL(CMPLXL(12200160415121876738,0) + CMPLXL(7540113804746346429,0);
+    printf("%Lf + %Lgi", creall(test), cimagl(test));
 	Matrix b = copy(a);
-	for(int i = 1; i<=100; i++) {
-		b = multiply(b, a);
-		printf("Iteration: %d\n", i);
-		printMatrix(b);
-	}
+	// for(int i = 1; i<=99; i++) {
+	// 	b = multiply(b, a);
+	// 	printf("Iteration: %d\n", i);
+	// 	printMatrix(b);
+	// }
 
     
 }
