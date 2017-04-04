@@ -400,9 +400,9 @@ void eigenvalues(Matrix m){
     printf("Eigenvalues: ");
     for(size_t i = 0;i< m.numRows;i++){
         if(i != m.numRows-1)
-            printf("%f + %fi, ", crealf(R.matrix[i][i]), cimagf(R.matrix[i][i]));
+            printf("%Lf + %Lfi, ", creall(R.matrix[i][i]), cimagl(R.matrix[i][i]));
         else
-            printf("%f + %fi", crealf(R.matrix[i][i]), cimagf(R.matrix[i][i]));
+            printf("%Lf + %Lfi", creall(R.matrix[i][i]), cimagl(R.matrix[i][i]));
 
     }
 }
