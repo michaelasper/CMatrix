@@ -238,19 +238,18 @@ Matrix multiply(Matrix a, Matrix b){
     @return A^n
 */
 Matrix power(Matrix a, int n) {
-	
 	Matrix b = multiply(a, a);
 	if(n == 0) {
-		return createIdentity(a.numRows);
+	    return createIdentity(a.numRows);
 	}
 	else if(n == 1){
-		return a;
+	    return a;
 	}
 	else if(n % 2 == 1) {
-		return power(multiply(a, b), (n-1)/2);
+	    return power(multiply(a, b), (n-1)/2);
 	}
 	else {
-		return power(b, n/2);
+	    return power(b, n/2);
 	}
 }
 
