@@ -32,7 +32,7 @@ double complex sign(double complex a){
 void randomize(Matrix *m){
     for(size_t i = 0; i < m->numRows ; i++){
         for(size_t j = 0; j < m->numCols; j++){
-             m->matrix[i][j] = 1+ ((double)rand()/RAND_MAX * 50) + (((double)rand()/RAND_MAX * 50) * I);
+             m->matrix[i][j] = ((double)rand()/RAND_MAX * 5) + (((double)rand()/RAND_MAX * 5) * I);
         }
     }
 }
@@ -224,34 +224,6 @@ Matrix multiply(Matrix a, Matrix b){
         }
     }
     return result;
-}
-/**
-    Matrix exponentiation for n >= 0
-    "Exponentiation by squaring"
-    Note: This algorithm runs in O(logn) time 
-    where n x n is the size of the square matrix
-   
-    Not sure what to do for n < 0
-    
-    @param a Matrix to be exponentiated
-    @param n exponent
-    @return A^n
-*/
-Matrix power(Matrix a, int n) {
-	
-	Matrix b = multiply(a, a);
-	if(n == 0) {
-		return createIdentity(a.numRows);
-	}
-	else if(n == 1){
-		return a;
-	}
-	else if(n % 2 == 1) {
-		return power(multiply(a, b), (n-1)/2);
-	}
-	else {
-		return power(b, n/2);
-	}
 }
 
 
@@ -445,7 +417,6 @@ int main(){
 
     //setup random matrices and multiply
     Matrix a = createRandMatrix(3,3);
-    printMatrix(a);
     eigenvalues(a);
     return 0;
     
