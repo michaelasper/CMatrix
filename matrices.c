@@ -225,8 +225,7 @@ Matrix multiply(Matrix a, Matrix b){
     }
     return result;
 }
-<<<<<<< HEAD
-=======
+
 /**
     Matrix exponentiation for n >= 0
     "Exponentiation by squaring"
@@ -254,7 +253,6 @@ Matrix power(Matrix a, int n) {
 	    return power(b, n/2);
 	}
 }
->>>>>>> 948052da01ee23599fef12c1df516329b1c91a28
 
 
 /**
