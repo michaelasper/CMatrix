@@ -225,6 +225,36 @@ Matrix multiply(Matrix a, Matrix b){
     }
     return result;
 }
+<<<<<<< HEAD
+=======
+/**
+    Matrix exponentiation for n >= 0
+    "Exponentiation by squaring"
+    Note: This algorithm runs in O(logn) time 
+    where n x n is the size of the square matrix
+   
+    Not sure what to do for n < 0
+    
+    @param a Matrix to be exponentiated
+    @param n exponent
+    @return A^n
+*/
+Matrix power(Matrix a, int n) {
+	Matrix b = multiply(a, a);
+	if(n == 0) {
+	    return createIdentity(a.numRows);
+	}
+	else if(n == 1){
+	    return a;
+	}
+	else if(n % 2 == 1) {
+	    return power(multiply(a, b), (n-1)/2);
+	}
+	else {
+	    return power(b, n/2);
+	}
+}
+>>>>>>> 948052da01ee23599fef12c1df516329b1c91a28
 
 
 /**
@@ -378,37 +408,6 @@ void eigenvalues(Matrix m){
 
     }
 }
-
-/**
-    Matrix exponentiation for n >= 0
-    "Exponentiation by squaring"
-    Note: This algorithm runs in O(logn) time 
-    where n x n is the size of the square matrix
-   
-    Not sure what to do for n < 0
-    
-    @param a Matrix to be exponentiated
-    @param n exponent
-    @return A^n
-*/
-Matrix power(Matrix a, int n) {
-	
-	Matrix b = multiply(a, a);
-	if(n == 0) {
-		return createIdentity(a.numRows);
-	}
-	else if(n == 1){
-		return a;
-	}
-	else if(n % 2 == 1) {
-		return power(multiply(a, b), (n-1)/2);
-	}
-	else {
-		return power(b, n/2);
-	}
-}
-
-
 
 int main(){
     // seed random with time
