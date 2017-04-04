@@ -21,6 +21,13 @@ typedef struct Matrix {
 } Matrix;
 
 
+/**
+
+    Sign of a number (complex or real)
+
+    @param a, complex number
+    @return sign of number
+*/
 long double complex sign(long double complex a){
     return a / cabsl(a);
 }
@@ -67,10 +74,10 @@ Matrix createMatrix(size_t const r, size_t const c){
 }
 
 /**
-    Returns a r x r Matrix
+    Returns a r x r Identity
 
     @param r The row x row size of the matrix
-    @return r x r Matrix
+    @return r x r Identity
 */
 Matrix createIdentity(size_t const r){
     Matrix temp = createMatrix(r,r);
@@ -111,7 +118,10 @@ Matrix createRandMatrix(size_t const r, size_t const c){
     return temp;
 }
 /**
-    Delete a matrix
+    Delete a matrix by freeing it 
+    in memory
+
+    @param m The matrix to free
 */
 void delete(Matrix m)
 {
@@ -232,8 +242,6 @@ Matrix multiply(Matrix a, Matrix b){
     "Exponentiation by squaring"
     Note: This algorithm runs in O(logn) time 
     where n x n is the size of the square matrix
-   
-    Not sure what to do for n < 0
     
     @param a Matrix to be exponentiated
     @param n exponent
@@ -273,7 +281,8 @@ void swapRows(size_t r1, size_t r2, Matrix *m){
 
 /**
 
-    Row reduces a matrix using Gaussian elimination with partial pivoting.
+    Row reduces a matrix using Gaussian 
+    elimination with partial pivoting.
 
     @param m matrix (M)
 */
@@ -329,7 +338,7 @@ Matrix transpose(Matrix m){
     Computes determinant for a square Matrix
 
     @param *m pointer to matrix (A)
-    @return double determinant of matrix (det(A))
+    @return long double complex determinant of matrix (det(A))
 */
 long double complex calcDet(Matrix m){
     if(m.numCols != m.numRows){
@@ -346,12 +355,25 @@ long double complex calcDet(Matrix m){
 }
 
 
+/**
+    Calculates the norm of a 2 dim vector
 
-
+    @param a complex number 
+    @param b complex number
+    @return ||[a,b]||
+*/
 double norm(long double complex a, long double complex b){
     return sqrt(cabsl(a)*cabsl(a) + cabsl(b)*cabsl(b));
 }
+/**
+    Finds Given's Matrix to 0 out a
+    specific location in a Matrix
 
+    @param m Matrix 
+    @param i row location of element
+    @param j col location of element
+    @returns Givens matrix to 0 out m[i][j]
+*/
 Matrix givensrotation(Matrix m, size_t i, size_t j){
     long double complex a = m.matrix[i-1][j];
     long double complex b = m.matrix[i][j];
@@ -377,9 +399,10 @@ Matrix givensrotation(Matrix m, size_t i, size_t j){
 }
 
 /**
-    QR factorization using Given's rotation
+    Repeated QR Factorization to find Eigenvalues
+    using Given's rotation
 
-    Dear lord, please have mercy on me
+    @param m Matrix
 */
 void eigenvalues(Matrix m){
     Matrix R = copy(m);
